@@ -52,6 +52,12 @@ html, body {
   transition: all 0.2s ease;
 }
 
+/* --- Backspace and Clear buttons in red --- */
+#keypad button.red {
+  border-color: #f33;
+  color: #f33;
+}
+
 #keypad button:active {
   background: #0ff;
   color: #111;
@@ -62,17 +68,10 @@ html, body {
 /* --- Loader --- */
 #loader {
   position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background: #111;
-  color: #0ff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 9999;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:#111; display:flex; justify-content:center; align-items:center;
+  flex-direction:column; color:#0ff; z-index:9999;
 }
 
 .spinner {
@@ -86,8 +85,8 @@ html, body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
 }
 
 /* --- Map Page --- */
@@ -96,7 +95,7 @@ html, body {
   width: 100%;
 }
 
-/* --- Responsive for Small Screens --- */
+/* --- Responsive for small screens --- */
 @media (max-width: 480px) {
   #display {
     font-size: 3em;
