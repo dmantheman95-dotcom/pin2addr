@@ -16,31 +16,28 @@ html, body {
   width: 100%;
 }
 
-.hidden {
-  display: none;
-}
+.hidden { display: none; }
 
-/* Map takes top part */
 #map {
   width: 100%;
-  flex-grow: 1;
-  transition: height 0.3s ease;
 }
 
-/* Bottom panel */
 .bottom-panel {
   background: #111;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between; /* keeps buttons at bottom */
-  flex-shrink: 0;
+  justify-content: flex-start;
   width: 100%;
   padding: 10px;
-  height: 45vh; /* mobile default */
-  max-height: 420px;
   box-sizing: border-box;
   border-top: 1px solid #333;
+}
+
+/* Mobile: fixed 50vh each */
+@media (max-width: 767px) {
+  #map { height: 50vh; }
+  .bottom-panel { height: 50vh; }
 }
 
 #display {
@@ -55,7 +52,6 @@ html, body {
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   width: 100%;
-  flex-grow: 0;
   margin-bottom: 10px;
 }
 
@@ -80,12 +76,9 @@ html, body {
   width: 90%;
   max-width: 300px;
   margin-top: 5px;
-  flex-shrink: 0;
 }
 
-#directions.hidden {
-  display: none;
-}
+#directions.hidden { display: none; }
 
 #result {
   margin-top: 8px;
@@ -119,20 +112,10 @@ html, body {
   margin-bottom: 10px;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 /* Desktop adjustments */
 @media(min-width: 768px) {
-  .bottom-panel {
-    height: 300px; /* fixed panel for desktop */
-  }
-  #map {
-    flex-grow: 0;
-    height: calc(100vh - 300px); /* map occupies remaining space */
-  }
+  #map { height: calc(100vh - 300px); }
+  .bottom-panel { height: 300px; }
 }
 
 /* Safe area for iPhones */
