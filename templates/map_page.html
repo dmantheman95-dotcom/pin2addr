@@ -1,55 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Map Directions</title>
-<link rel="stylesheet" href="/static/style.css">
-<script>
-let map, marker, currentPos=null;
-window.initMap = function() {
-    map = new google.maps.Map(document.getElementById("map"), {
-        center: {lat:0,lng:0},
-        zoom: 14
-    });
-
-    // Geolocation
-    if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(
-            pos=>{
-                currentPos = {lat: pos.coords.latitude, lng: pos.coords.longitude};
-                map.setCenter(currentPos);
-                // Directions
-                const directionsService = new google.maps.DirectionsService();
-                const directionsRenderer = new google.maps.DirectionsRenderer();
-                directionsRenderer.setMap(map);
-
-                directionsService.route({
-                    origin: currentPos,
-                    destination: "{{ address }}",
-                    travelMode: 'DRIVING'
-                }, (result, status)=>{
-                    if(status==='OK'){
-                        directionsRenderer.setDirections(result);
-                    } else {
-                        alert('Directions request failed: '+status);
-                    }
-                });
-            },
-            err=>alert("Geolocation failed")
-        );
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Map Directions</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: #111;
+      color: #fff;
     }
-};
-</script>
-<script async
-  src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&callback=initMap">
-</script>
-<style>
-html,body{margin:0;padding:0;height:100%;width:100%}
-#map{height:100%;width:100%}
-</style>
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+    #loader {
+      position: fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background:#111;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      z-index:9999;
+      flex-direction:column;
+      color:#0ff;
+    }
+    .spinner {
+      border: 4px solid #333;
+      border-top: 4px solid #0ff;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+  </style>
 </head>
 <body>
-<div id="map"></div>
+  <div id="loader">
+    <div class="spinner"></div>
+    <p>Loading map...</p>
+  </div>
+  <div id="map"></div>
+
+  <script>
+    let map;
+    function initMap() {
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 0, lng: 0 },
+        zoom: 14
+      });
+
+      if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            const currentPos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+
+            map.setCenter(currentPos);
+
+            const directionsService = new google.maps.DirectionsService();
+            const directionsRenderer = new google.maps.DirectionsRenderer();
+            directionsRenderer.setMap(map);
+
+            directionsService.route({
+              origin: currentPos,
+              destination: "{{ address }}",
+              travelMode: 'DRIVING'
+            }, (result, status) => {
+              if(status === 'OK'){
+                directionsRenderer.setDirections(result);
+              } else {
+                alert("Directions request failed: " + status);
+              }
+              document.getElementById("loader").style.display = "none";
+            });
+
+          },
+          error => {
+            alert("Geolocation failed or denied.");
+            document.getElementById("loader").style.display = "none";
+          }
+        );
+      } else {
+        alert("Geolocation not supported by your browser.");
+        document.getElementById("loader").style.display = "none";
+      }
+    }
+  </script>
+
+  <script async
+    src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&callback=initMap">
+  </script>
 </body>
 </html>
