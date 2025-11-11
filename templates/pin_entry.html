@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enter PIN</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="pin-container">
+    <div id="display">----</div>
+    <div id="keypad"></div>
+    <form id="pinForm" method="POST" action="/submit_pin">
+        <input type="hidden" name="pin" id="hiddenPin">
+    </form>
+    {% if error %}
+        <p style="color:red">{{ error }}</p>
+    {% endif %}
+</div>
+
+<script>
+const display = document.getElementById("display");
+const keypad = document.getElementById("keypad");
+const hiddenPin = document.getElementById("hiddenPin");
+const form = document.getElementById("pinForm");
+
+const keys = ['1','2','3','4','5','6','7','8','9','0','C'];
+keys.forEach(k=>{
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = k;
+    btn.onclick = ()=>{
+        if(k==='C'){
+            display.textContent = '----';
+        } else if(display.textContent.replace(/-/g,'').length < 4){
+            display.textContent = (display.textContent + k).replace(/-/g,'').slice(-4).padStart(4,'-');
+        }
+
+        if(display.textContent.replace(/-/g,'').length === 4){
+            hiddenPin.value = display.textContent.replace(/-/g,'');
+            form.submit();
+        }
+    };
+    keypad.appendChild(btn);
+});
+</script>
+</body>
+</html>
