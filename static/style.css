@@ -1,92 +1,64 @@
+/* --- General Reset --- */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
+  font-family: "SF Pro Display", system-ui, sans-serif;
   background: #111;
   color: #fff;
-  font-family: "SF Pro Display", system-ui, sans-serif;
-  overflow: hidden;
 }
 
-.app {
+/* --- PIN Entry Page --- */
+.pin-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  width: 100%;
-}
-
-.hidden { display: none; }
-
-#map {
-  width: 100%;
-}
-
-.bottom-panel {
-  background: #111;
-  display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  justify-content: flex-start;
+  height: 100%;
   width: 100%;
   padding: 10px;
   box-sizing: border-box;
-  border-top: 1px solid #333;
-}
-
-/* Mobile: fixed 50vh each */
-@media (max-width: 767px) {
-  #map { height: 50vh; }
-  .bottom-panel { height: 50vh; }
 }
 
 #display {
-  font-size: 3em;
+  font-size: 4em;
   letter-spacing: 5px;
   color: #0ff;
-  margin: 5px 0;
+  margin-bottom: 20px;
 }
 
 #keypad {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  width: 100%;
-  margin-bottom: 10px;
+  grid-template-columns: repeat(3, 80px);
+  grid-gap: 10px;
+  justify-content: center;
 }
 
-#keypad button, #submit, #directions {
-  font-size: 1.5em;
+#keypad button {
+  font-size: 2em;
   background: #222;
   color: #0ff;
-  border: 1px solid #0ff;
+  border: 2px solid #0ff;
   border-radius: 12px;
+  width: 80px;
+  height: 80px;
   cursor: pointer;
-  transition: background 0.2s ease;
-  width: 100%;
-  padding: 15px;
+  transition: all 0.2s ease;
 }
 
-#keypad button:active, #submit:active, #directions:active {
+#keypad button:active {
   background: #0ff;
   color: #111;
 }
 
-#submit, #directions {
-  width: 90%;
-  max-width: 300px;
-  margin-top: 5px;
+/* --- Map Page --- */
+#map {
+  height: 100vh;
+  width: 100%;
 }
 
-#directions.hidden { display: none; }
-
-#result {
-  margin-top: 8px;
-  font-size: 0.9em;
-  text-align: center;
-}
-
-/* Loader */
+/* --- Loader --- */
 #loader {
   position: fixed;
   top: 0;
@@ -96,31 +68,42 @@ html, body {
   background: #111;
   color: #0ff;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 10;
+  flex-direction: column;
+  z-index: 9999;
 }
 
 .spinner {
   border: 4px solid #333;
   border-top: 4px solid #0ff;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   animation: spin 1s linear infinite;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
-/* Desktop adjustments */
-@media(min-width: 768px) {
-  #map { height: calc(100vh - 300px); }
-  .bottom-panel { height: 300px; }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* Safe area for iPhones */
-@supports (padding: env(safe-area-inset-bottom)) {
-  .bottom-panel {
-    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+/* --- Responsive adjustments for small screens --- */
+@media (max-width: 480px) {
+  #display {
+    font-size: 3em;
+    margin-bottom: 15px;
+  }
+
+  #keypad {
+    grid-template-columns: repeat(3, 60px);
+    grid-gap: 8px;
+  }
+
+  #keypad button {
+    width: 60px;
+    height: 60px;
+    font-size: 1.8em;
   }
 }
