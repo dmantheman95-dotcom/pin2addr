@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PIN Lookup</title>
-  <link rel="stylesheet" href="/static/style.css">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script async
+    src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&callback=initMap">
+  </script>
 </head>
 <body>
   <div class="container">
-    <h1>Enter 4-Digit PIN</h1>
     <div id="display">----</div>
     <div id="keypad"></div>
     <button id="submit">Submit</button>
@@ -18,6 +19,26 @@
   </div>
 
   <script>
+    let map, marker;
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 43.7, lng: -79.4 },
+        zoom: 10,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+        styles: [
+          { elementType: "geometry", stylers: [{ color: "#212121" }] },
+          { elementType: "labels.text.stroke", stylers: [{ color: "#212121" }] },
+          { elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+          { featureType: "poi", stylers: [{ visibility: "off" }] },
+          { featureType: "road", stylers: [{ color: "#383838" }] },
+          { featureType: "water", stylers: [{ color: "#000000" }] }
+        ],
+      });
+    }
+
     const display = document.getElementById('display');
     const keypad = document.getElementById('keypad');
     const result = document.getElementById('result');
@@ -30,7 +51,10 @@
       btn.onclick = () => {
         if (k === 'C') display.textContent = '----';
         else if (display.textContent.replace(/-/g,'').length < 4)
-          display.textContent = (display.textContent + k).replace(/-/g,'').slice(-4).padStart(4,'-');
+          display.textContent = (display.textContent + k)
+            .replace(/-/g,'')
+            .slice(-4)
+            .padStart(4,'-');
       };
       keypad.appendChild(btn);
     });
@@ -52,26 +76,18 @@
         result.textContent = 'PIN not found';
         return;
       }
+
       const addr = data.address;
       result.textContent = addr;
 
-      // Show on map
-      const mapDiv = document.getElementById('map');
-      mapDiv.style.display = 'block';
-      if (!window.map) {
-        window.map = L.map('map').setView([43.7, -79.4], 10); // fallback: Toronto
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-        }).addTo(window.map);
-      }
-
-      // Geocode via free API
-      const geo = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}`);
-      const loc = await geo.json();
-      if (loc.length > 0) {
-        const { lat, lon } = loc[0];
-        window.map.setView([lat, lon], 15);
-        L.marker([lat, lon]).addTo(window.map).bindPopup(addr).openPopup();
+      const geoRes = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addr)}&key={{ google_api_key }}`);
+      const geoData = await geoRes.json();
+      if (geoData.results && geoData.results.length > 0) {
+        const { lat, lng } = geoData.results[0].geometry.location;
+        map.setCenter({ lat, lng });
+        map.setZoom(15);
+        if (marker) marker.setMap(null);
+        marker = new google.maps.Marker({ position: { lat, lng }, map });
       }
     };
   </script>
