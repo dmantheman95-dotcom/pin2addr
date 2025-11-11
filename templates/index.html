@@ -24,22 +24,26 @@
     <p>Loading map...</p>
   </div>
 
-  <div class="container hidden">
-    <div id="display">----</div>
-    <div id="keypad"></div>
-    <button id="submit">Submit</button>
-    <div id="result"></div>
+  <div class="app hidden">
     <div id="map"></div>
+
+    <div class="bottom-panel">
+      <div id="display">----</div>
+      <div id="keypad"></div>
+      <button id="submit">Submit</button>
+      <div id="result"></div>
+      <button id="directions" class="hidden">Get Directions</button>
+    </div>
   </div>
 
   <script>
-    let map, marker;
+    let map, marker, lastAddress = null, lastCoords = null, currentPos = null;
 
     // --- Initialize Google Map ---
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 43.7, lng: -79.4 },
-        zoom: 10,
+        center: { lat: 43.7, lng: -79.4 }, // fallback
+        zoom: 12,
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,
@@ -53,17 +57,32 @@
         ],
       });
 
-      // Hide loader when map is ready
+      // Try to get device location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            currentPos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            map.setCenter(currentPos);
+            map.setZoom(14);
+          },
+          (err) => console.warn("Geolocation denied or failed", err)
+        );
+      }
+
       document.getElementById("loader").style.display = "none";
-      document.querySelector(".container").classList.remove("hidden");
+      document.querySelector(".app").classList.remove("hidden");
     }
 
-    // --- UI Logic ---
     const display = document.getElementById('display');
     const keypad = document.getElementById('keypad');
     const result = document.getElementById('result');
     const submitBtn = document.getElementById('submit');
+    const dirBtn = document.getElementById('directions');
 
+    // --- Keypad ---
     const keys = ['1','2','3','4','5','6','7','8','9','0','C'];
     keys.forEach(k => {
       const btn = document.createElement('button');
@@ -72,6 +91,7 @@
         if (k === 'C') {
           display.textContent = '----';
           result.textContent = '';
+          dirBtn.classList.add('hidden');
         } else if (display.textContent.replace(/-/g,'').length < 4) {
           display.textContent = (display.textContent + k)
             .replace(/-/g,'')
@@ -82,6 +102,7 @@
       keypad.appendChild(btn);
     });
 
+    // --- Lookup ---
     submitBtn.onclick = async () => {
       const pin = display.textContent.replace(/-/g,'');
       if (pin.length !== 4) {
@@ -89,6 +110,7 @@
         return;
       }
       result.textContent = 'Looking up...';
+      dirBtn.classList.add('hidden');
       const res = await fetch('/lookup', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -102,8 +124,8 @@
 
       const addr = data.address;
       result.textContent = addr;
+      lastAddress = addr;
 
-      // --- Geocode address to coordinates ---
       const geoRes = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addr)}&key={{ google_api_key }}`);
       const geoData = await geoRes.json();
       if (geoData.results && geoData.results.length > 0) {
@@ -112,10 +134,24 @@
         map.setZoom(15);
         if (marker) marker.setMap(null);
         marker = new google.maps.Marker({ position: { lat, lng }, map });
+        lastCoords = { lat, lng };
+        dirBtn.classList.remove('hidden');
       }
     };
 
-    // --- Register Service Worker for PWA ---
+    // --- Directions ---
+    dirBtn.onclick = () => {
+      if (!lastCoords) return;
+      let gmapsUrl;
+      if (currentPos) {
+        gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${currentPos.lat},${currentPos.lng}&destination=${encodeURIComponent(lastAddress)}`;
+      } else {
+        gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(lastAddress)}`;
+      }
+      window.open(gmapsUrl, '_blank');
+    };
+
+    // --- Service Worker ---
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/static/service-worker.js")
         .then(() => console.log("✅ Service Worker registered"))
