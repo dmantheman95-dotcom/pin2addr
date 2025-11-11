@@ -1,14 +1,18 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for
 import csv
 
 app = Flask(__name__)
 
-# Load PINs from CSV at startup
+# Load PINs from CSV
 PIN_ADDRESSES = {}
 with open("pins.csv") as f:
     reader = csv.DictReader(f)
     for row in reader:
         PIN_ADDRESSES[row["pin"]] = row["address"]
+
+# Get Google API key from environment
+GOOGLE_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
 
 @app.route("/")
 def pin_entry():
@@ -27,7 +31,7 @@ def show_map(pin):
     address = PIN_ADDRESSES.get(pin)
     if not address:
         return "PIN not found", 404
-    return render_template("map_page.html", address=address)
+    return render_template("map_page.html", address=address, google_api_key=GOOGLE_API_KEY)
 
 if __name__ == "__main__":
     app.run(debug=True)
