@@ -1,0 +1,16 @@
+{
+  "name": "PIN Lookup",
+  "short_name": "PIN Lookup",
+  "description": "Enter a 4-digit PIN to see an address and map.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111",
+  "theme_color": "#111",
+  "icons": [
+    {
+      "src": "/static/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
