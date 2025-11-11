@@ -95,7 +95,6 @@
             .slice(-4)
             .padStart(4,'-');
         }
-        adjustMapHeight();
       };
       keypad.appendChild(btn);
     });
@@ -150,19 +149,19 @@
       window.open(gmapsUrl, '_blank');
     };
 
-    // --- Responsive dynamic map resizing ---
+    // --- Responsive adjustment ---
     function adjustMapHeight() {
       const bottomPanel = document.querySelector('.bottom-panel');
       const mapEl = document.getElementById('map');
       const windowHeight = window.innerHeight;
 
-      if(window.innerWidth < 768) {
-        const newBottomHeight = Math.min(0.5 * windowHeight, bottomPanel.scrollHeight);
-        bottomPanel.style.height = newBottomHeight + 'px';
-        mapEl.style.height = (windowHeight - newBottomHeight) + 'px';
-      } else {
+      if(window.innerWidth >= 768) {
         bottomPanel.style.height = '300px';
         mapEl.style.height = (windowHeight - 300) + 'px';
+      } else {
+        // Mobile: fixed 50% for map & bottom panel
+        mapEl.style.height = '50vh';
+        bottomPanel.style.height = '50vh';
       }
     }
     window.addEventListener('resize', adjustMapHeight);
