@@ -10,23 +10,26 @@
   <div class="pin-container">
     <div id="display">----</div>
     <div id="keypad"></div>
+
     <form id="pinForm" method="POST" action="/submit_pin">
       <input type="hidden" name="pin" id="hiddenPin">
     </form>
+
     {% if error %}
       <p style="color:red">{{ error }}</p>
     {% endif %}
   </div>
 
-  <!-- ✅ Place the updated keypad script here -->
+  <!-- ✅ Keypad Script -->
   <script>
-    const display = document.getElementById("display");
-    const keypad = document.getElementById("keypad");
-    const hiddenPin = document.getElementById("hiddenPin");
-    const form = document.getElementById("pinForm");
+    document.addEventListener("DOMContentLoaded", () => {
+      const display = document.getElementById("display");
+      const keypad = document.getElementById("keypad");
+      const hiddenPin = document.getElementById("hiddenPin");
+      const form = document.getElementById("pinForm");
 
-    const keys = ['1','2','3','4','5','6','7','8','9','0','⌫','C']; // Backspace and Clear
-    keys.forEach(k => {
+      const keys = ['1','2','3','4','5','6','7','8','9','0','⌫','C']; // Backspace & Clear
+      keys.forEach(k => {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.textContent = k;
@@ -35,19 +38,23 @@
         if(k === '⌫' || k === 'C') btn.classList.add("red");
 
         btn.onclick = () => {
-            let current = display.textContent.replace(/-/g,'');
-            if(k === 'C') {
-                current = '';
-            } else if(k === '⌫') {
-                current = current.slice(0, -1);
-            } else if(current.length < 4) {
-                current += k;
-            }
-            display.textContent = current.padEnd(4,'-');
-            hiddenPin.value = current;
-            if(current.length === 4) form.submit();
+          let current = display.textContent.replace(/-/g,''); // remove placeholders
+          if(k === 'C') {
+            current = '';
+          } else if(k === '⌫') {
+            current = current.slice(0, -1); // remove last digit
+          } else if(current.length < 4) {
+            current += k;
+          }
+
+          display.textContent = current.padEnd(4,'-'); // show placeholders
+          hiddenPin.value = current;
+
+          // Auto-submit when 4 digits entered
+          if(current.length === 4) form.submit();
         };
         keypad.appendChild(btn);
+      });
     });
   </script>
 </body>
