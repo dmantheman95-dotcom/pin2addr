@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, render_template
 import csv
 import os
-import urllib.parse
 
 app = Flask(__name__)
 
@@ -12,8 +11,8 @@ def load_pin_map(path=DATA_FILE):
     with open(path, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
-            pin = row.get('pin','').strip()
-            addr = row.get('address','').strip()
+            pin = row.get('pin', '').strip()
+            addr = row.get('address', '').strip()
             if pin and addr:
                 m[pin] = addr
     return m
@@ -25,7 +24,8 @@ def validate_pin(pin):
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    google_api_key = os.environ.get("GOOGLE_MAPS_API_KEY", "")
+    return render_template("index.html", google_api_key=google_api_key)
 
 @app.route("/lookup", methods=["POST"])
 def lookup():
