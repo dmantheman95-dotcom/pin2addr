@@ -1,37 +1,54 @@
-<div id="keypad"></div>
-<form id="pinForm" method="POST" action="/submit_pin">
-    <input type="hidden" name="pin" id="hiddenPin">
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enter PIN</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="pin-container">
+    <div id="display">----</div>
+    <div id="keypad"></div>
+    <form id="pinForm" method="POST" action="/submit_pin">
+      <input type="hidden" name="pin" id="hiddenPin">
+    </form>
+    {% if error %}
+      <p style="color:red">{{ error }}</p>
+    {% endif %}
+  </div>
 
-<script>
-const display = document.getElementById("display");
-const keypad = document.getElementById("keypad");
-const hiddenPin = document.getElementById("hiddenPin");
-const form = document.getElementById("pinForm");
+  <!-- ✅ Place the updated keypad script here -->
+  <script>
+    const display = document.getElementById("display");
+    const keypad = document.getElementById("keypad");
+    const hiddenPin = document.getElementById("hiddenPin");
+    const form = document.getElementById("pinForm");
 
-const keys = ['1','2','3','4','5','6','7','8','9','0','⌫','C']; // Added backspace
+    const keys = ['1','2','3','4','5','6','7','8','9','0','⌫','C']; // Backspace and Clear
+    keys.forEach(k => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = k;
 
-keys.forEach(k => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = k;
-    btn.onclick = () => {
-        let current = display.textContent.replace(/-/g,''); // remove placeholders
-        if(k === 'C') {
-            current = '';
-        } else if(k === '⌫') {
-            current = current.slice(0, -1); // remove last character
-        } else if(current.length < 4) {
-            current += k;
-        }
+        // Make ⌫ and C red
+        if(k === '⌫' || k === 'C') btn.classList.add("red");
 
-        display.textContent = current.padEnd(4,'-'); // show with placeholders
-        hiddenPin.value = current;
-
-        if(current.length === 4) {
-            form.submit();
-        }
-    };
-    keypad.appendChild(btn);
-});
-</script>
+        btn.onclick = () => {
+            let current = display.textContent.replace(/-/g,'');
+            if(k === 'C') {
+                current = '';
+            } else if(k === '⌫') {
+                current = current.slice(0, -1);
+            } else if(current.length < 4) {
+                current += k;
+            }
+            display.textContent = current.padEnd(4,'-');
+            hiddenPin.value = current;
+            if(current.length === 4) form.submit();
+        };
+        keypad.appendChild(btn);
+    });
+  </script>
+</body>
+</html>
