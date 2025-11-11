@@ -1,43 +1,33 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, render_template, request, redirect, url_for
 import csv
-import os
 
 app = Flask(__name__)
 
-DATA_FILE = "pins.csv"
-
-def load_pin_map(path=DATA_FILE):
-    m = {}
-    with open(path, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            pin = row.get('pin', '').strip()
-            addr = row.get('address', '').strip()
-            if pin and addr:
-                m[pin] = addr
-    return m
-
-pin_map = load_pin_map()
-
-def validate_pin(pin):
-    return pin.isdigit() and len(pin) == 4
+# Load PINs from CSV at startup
+PIN_ADDRESSES = {}
+with open("pins.csv") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        PIN_ADDRESSES[row["pin"]] = row["address"]
 
 @app.route("/")
-def home():
-    google_api_key = os.environ.get("GOOGLE_MAPS_API_KEY", "")
-    return render_template("index.html", google_api_key=google_api_key)
+def pin_entry():
+    return render_template("pin_entry.html")
 
-@app.route("/lookup", methods=["POST"])
-def lookup():
-    data = request.get_json(silent=True)
-    pin = data.get("pin") if data else None
-    if not validate_pin(str(pin)):
-        return jsonify({"error": "Invalid PIN"}), 400
-    address = pin_map.get(pin)
+@app.route("/submit_pin", methods=["POST"])
+def submit_pin():
+    pin = request.form.get("pin")
+    address = PIN_ADDRESSES.get(pin)
     if not address:
-        return jsonify({"found": False}), 404
-    return jsonify({"found": True, "address": address})
+        return render_template("pin_entry.html", error="PIN not found")
+    return redirect(url_for("show_map", pin=pin))
+
+@app.route("/map/<pin>")
+def show_map(pin):
+    address = PIN_ADDRESSES.get(pin)
+    if not address:
+        return "PIN not found", 404
+    return render_template("map_page.html", address=address)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=True)
