@@ -42,7 +42,7 @@
     // Make initMap global for Google Maps callback
     window.initMap = function() {
       map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 43.7, lng: -79.4 }, // fallback
+        center: { lat: 43.7, lng: -79.4 },
         zoom: 12,
         mapTypeControl: false,
         streetViewControl: false,
@@ -98,6 +98,7 @@
             .slice(-4)
             .padStart(4,'-');
         }
+        adjustMapHeight(); // dynamic resize when typing
       };
       keypad.appendChild(btn);
     });
@@ -151,6 +152,20 @@
       }
       window.open(gmapsUrl, '_blank');
     };
+
+    // --- Dynamic map resizing ---
+    function adjustMapHeight() {
+      const bottomPanel = document.querySelector('.bottom-panel');
+      const mapEl = document.getElementById('map');
+      const windowHeight = window.innerHeight;
+
+      const newBottomHeight = Math.min(0.5 * windowHeight, bottomPanel.scrollHeight);
+      bottomPanel.style.height = newBottomHeight + 'px';
+
+      mapEl.style.height = (windowHeight - newBottomHeight) + 'px';
+    }
+    window.addEventListener('resize', adjustMapHeight);
+    adjustMapHeight();
 
     // --- Service Worker ---
     if ("serviceWorker" in navigator) {
