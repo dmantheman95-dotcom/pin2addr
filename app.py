@@ -4,15 +4,16 @@ import csv
 
 app = Flask(__name__)
 
-# Load PINs from CSV
+# Load pins
 PIN_ADDRESSES = {}
 with open("pins.csv") as f:
     reader = csv.DictReader(f)
     for row in reader:
         PIN_ADDRESSES[row["pin"]] = row["address"]
 
-# Get Google API key from environment
+# Read Google Maps key
 GOOGLE_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
+print("Loaded Google Maps API key:", GOOGLE_API_KEY[:6] + "..." if GOOGLE_API_KEY else "MISSING")
 
 @app.route("/")
 def pin_entry():
@@ -31,7 +32,11 @@ def show_map(pin):
     address = PIN_ADDRESSES.get(pin)
     if not address:
         return "PIN not found", 404
-    return render_template("map_page.html", address=address, google_api_key=GOOGLE_API_KEY)
+    return render_template(
+        "map_page.html",
+        address=address,
+        google_api_key=GOOGLE_API_KEY,
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)
