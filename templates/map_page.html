@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map Directions</title>
+<link rel="stylesheet" href="/static/style.css">
+<script>
+let map, marker, currentPos=null;
+window.initMap = function() {
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: {lat:0,lng:0},
+        zoom: 14
+    });
+
+    // Geolocation
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(
+            pos=>{
+                currentPos = {lat: pos.coords.latitude, lng: pos.coords.longitude};
+                map.setCenter(currentPos);
+                // Directions
+                const directionsService = new google.maps.DirectionsService();
+                const directionsRenderer = new google.maps.DirectionsRenderer();
+                directionsRenderer.setMap(map);
+
+                directionsService.route({
+                    origin: currentPos,
+                    destination: "{{ address }}",
+                    travelMode: 'DRIVING'
+                }, (result, status)=>{
+                    if(status==='OK'){
+                        directionsRenderer.setDirections(result);
+                    } else {
+                        alert('Directions request failed: '+status);
+                    }
+                });
+            },
+            err=>alert("Geolocation failed")
+        );
+    }
+};
+</script>
+<script async
+  src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&callback=initMap">
+</script>
+<style>
+html,body{margin:0;padding:0;height:100%;width:100%}
+#map{height:100%;width:100%}
+</style>
+</head>
+<body>
+<div id="map"></div>
+</body>
+</html>
