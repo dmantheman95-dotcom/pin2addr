@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="/static/style.css" />
 
   <script>
-    // --- Make initMap global BEFORE Google Maps loads ---
+    // --- Global initMap BEFORE Google Maps loads ---
     let map, marker, lastAddress = null, lastCoords = null, currentPos = null;
 
     window.initMap = function() {
@@ -34,7 +34,6 @@
         ],
       });
 
-      // Geolocation
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           pos => {
@@ -51,7 +50,6 @@
     }
   </script>
 
-  <!-- Google Maps script loaded after initMap is defined -->
   <script async
     src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&callback=initMap">
   </script>
@@ -97,7 +95,7 @@
             .slice(-4)
             .padStart(4,'-');
         }
-        adjustMapHeight(); // dynamic map resize on input
+        adjustMapHeight();
       };
       keypad.appendChild(btn);
     });
@@ -152,15 +150,20 @@
       window.open(gmapsUrl, '_blank');
     };
 
-    // --- Dynamic map resizing ---
+    // --- Responsive dynamic map resizing ---
     function adjustMapHeight() {
       const bottomPanel = document.querySelector('.bottom-panel');
       const mapEl = document.getElementById('map');
       const windowHeight = window.innerHeight;
 
-      const newBottomHeight = Math.min(0.5 * windowHeight, bottomPanel.scrollHeight);
-      bottomPanel.style.height = newBottomHeight + 'px';
-      mapEl.style.height = (windowHeight - newBottomHeight) + 'px';
+      if(window.innerWidth < 768) {
+        const newBottomHeight = Math.min(0.5 * windowHeight, bottomPanel.scrollHeight);
+        bottomPanel.style.height = newBottomHeight + 'px';
+        mapEl.style.height = (windowHeight - newBottomHeight) + 'px';
+      } else {
+        bottomPanel.style.height = '300px';
+        mapEl.style.height = (windowHeight - 300) + 'px';
+      }
     }
     window.addEventListener('resize', adjustMapHeight);
     adjustMapHeight();
