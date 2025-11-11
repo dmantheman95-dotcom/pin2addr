@@ -30,40 +30,50 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const display = document.getElementById("display");
-      const keypad = document.getElementById("keypad");
-      const hiddenPin = document.getElementById("hiddenPin");
-      const form = document.getElementById("pinForm");
+document.addEventListener("DOMContentLoaded", () => {
+  const display = document.getElementById("display");
+  const keypad = document.getElementById("keypad");
+  const hiddenPin = document.getElementById("hiddenPin");
+  const form = document.getElementById("pinForm");
 
-      const keys = ['1','2','3','4','5','6','7','8','9','0','⌫','C'];
-      keys.forEach(k => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = k;
+  const keys = ['1','2','3','4','5','6','7','8','9','0','⌫','C'];
+  keys.forEach(k => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = k;
 
-        // Backspace & Clear in red
-        if(k === '⌫' || k === 'C') btn.classList.add("red");
+    if(k === '⌫' || k === 'C') btn.classList.add("red");
 
-        btn.onclick = () => {
-          let current = display.textContent.replace(/-/g,'');
-          if(k === 'C') {
-            current = '';
-          } else if(k === '⌫') {
-            current = current.slice(0, -1);
-          } else if(current.length < 4) {
-            current += k;
-          }
+    btn.onclick = () => {
+      let current = display.textContent.replace(/-/g,'');
+      if(k === 'C') {
+        current = '';
+      } else if(k === '⌫') {
+        current = current.slice(0, -1);
+      } else if(current.length < 4) {
+        current += k;
+      }
 
-          display.textContent = current.padEnd(4,'-');
-          hiddenPin.value = current;
+      display.textContent = current.padEnd(4,'-');
+      hiddenPin.value = current;
 
-          // Auto-submit on 4 digits
-          if(current.length === 4) form.submit();
-        };
-        keypad.appendChild(btn);
-      });
-    });
-  </script>
+      if(current.length === 4) form.submit();
+    };
+    keypad.appendChild(btn);
+  });
+});
+
+// ✅ Reset PIN when returning to page
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted || window.performance.getEntriesByType("navigation")[0].type === "back_forward") {
+    const display = document.getElementById("display");
+    const hiddenPin = document.getElementById("hiddenPin");
+    if(display && hiddenPin){
+      display.textContent = '----';
+      hiddenPin.value = '';
+    }
+  }
+});
+</script>
 </body>
 </html>
