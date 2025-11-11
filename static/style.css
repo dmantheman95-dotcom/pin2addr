@@ -20,32 +20,35 @@ html, body {
   display: none;
 }
 
-/* Map on top half */
+/* Map occupies remaining space above bottom panel */
 #map {
   flex: 1;
   width: 100%;
+  transition: height 0.3s ease;
 }
 
-/* Bottom keypad area */
+/* Bottom panel fills roughly half of the screen */
 .bottom-panel {
   background: #111;
-  padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   flex-shrink: 0;
-  height: 45vh;
+  width: 100%;
+  padding: 10px;
+  height: 45vh; /* fills 45% of screen by default */
   max-height: 420px;
   box-sizing: border-box;
   border-top: 1px solid #333;
+  transition: height 0.3s ease;
 }
 
 #display {
   font-size: 3em;
   letter-spacing: 5px;
   color: #0ff;
-  margin: 10px 0;
+  margin: 5px 0;
 }
 
 #keypad {
@@ -124,6 +127,7 @@ html, body {
   100% { transform: rotate(360deg); }
 }
 
+/* Safe area for iPhones */
 @supports (padding: env(safe-area-inset-bottom)) {
   .bottom-panel {
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
