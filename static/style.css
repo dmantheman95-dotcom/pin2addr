@@ -1,3 +1,4 @@
+/* Reset */
 html, body {
   margin: 0;
   padding: 0;
@@ -9,6 +10,7 @@ html, body {
   overflow: hidden;
 }
 
+/* App container */
 .app {
   display: flex;
   flex-direction: column;
@@ -27,7 +29,7 @@ html, body {
   transition: height 0.3s ease;
 }
 
-/* Bottom panel fills roughly half of the screen */
+/* Bottom panel */
 .bottom-panel {
   background: #111;
   display: flex;
@@ -37,7 +39,7 @@ html, body {
   flex-shrink: 0;
   width: 100%;
   padding: 10px;
-  height: 45vh; /* fills 45% of screen by default */
+  height: 45vh; /* default height */
   max-height: 420px;
   box-sizing: border-box;
   border-top: 1px solid #333;
