@@ -113,3 +113,37 @@ html, body {
     font-size: 1.8em;
   }
 }
+
+.message-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: #fff;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.message {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  color: #0ff;
+}
+
+.maps-btn, .back-btn {
+  background: #0ff;
+  color: #111;
+  border: none;
+  padding: 0.8rem 1.4rem;
+  margin: 0.5rem;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 80%;
+  max-width: 300px;
+}
+
+.maps-btn:hover, .back-btn:hover {
+  opacity: 0.85;
+}
