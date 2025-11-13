@@ -1,4 +1,5 @@
-pin,address
-1234,123 Main St, Toronto, ON
-0000,456 Elm Ave, Ottawa, ON
-4321,789 King Rd, Vancouver, BC
+pin,address,message
+1234,"290 Bremner Blvd, Toronto, ON M5V 3L9","Welcome to The CN Tower!"
+5678,"1 Apple Park Way, Cupertino, CA","Meet at the main entrance"
+9999,,
+
